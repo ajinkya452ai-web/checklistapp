@@ -1,0 +1,10 @@
+.env
+/vendor/
+/node_modules/
+*.log
+.DS_Store
+.idea/
+.vscode/
+/public/uploads/
+/backups/
+*.sql.gz
