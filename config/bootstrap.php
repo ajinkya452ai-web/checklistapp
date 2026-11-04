@@ -15,7 +15,7 @@ function loadEnv(string $file): void {
 loadEnv(dirname(__DIR__).'/.env');
 function cfg(string $key,string $default=''): string { $v=getenv($key); return $v===false?$default:$v; }
 date_default_timezone_set(cfg('APP_TIMEZONE','Asia/Kolkata'));
-ini_set('display_errors','0');
+ini_set('display_errors','1');
 ini_set('log_errors','1');
 if (PHP_SAPI!=='cli') {
     header('X-Content-Type-Options: nosniff');
@@ -41,7 +41,15 @@ function db(): PDO {
 function e($value): string {return htmlspecialchars((string)$value,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');}
 function csrf(): string {if(empty($_SESSION['csrf']))$_SESSION['csrf']=bin2hex(random_bytes(32));return $_SESSION['csrf'];}
 function checkCsrf(): void {if(!hash_equals(csrf(),(string)($_POST['csrf']??''))) {http_response_code(403);exit('Invalid security token. Reload and retry.');}}
-function redirect(string $url): void {header('Location: '.$url, true,303);exit;}
+function redirect(string $path): void
+{
+    //$basePath = rtrim((string) env('BASE_PATH', ''), '/');
+    $basePath = '/sites/checklist/public';
+    $path = '/' . ltrim($path, '/');
+
+    header('Location: ' . $basePath . $path, true, 302);
+    exit;
+}
 function auth(): int {if(empty($_SESSION['user_id']))redirect('/login.php');return (int)$_SESSION['user_id'];}
 function flash(string $message): void {$_SESSION['flash']=$message;}
 function validMonth(string $month): bool {return preg_match('/^\d{4}-(0[1-9]|1[0-2])$/D',$month)===1 && (int)substr($month,0,4)>=2000 && (int)substr($month,0,4)<=2100;}
